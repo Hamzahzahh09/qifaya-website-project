@@ -1,5 +1,4 @@
 import { Module } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
 import { Product } from './entities/product.entity';
 import { Category } from './entities/category.entity';
 import { ProductVariant } from './entities/product-variant.entity';
@@ -7,6 +6,7 @@ import { ProductImage } from './entities/product-image.entity';
 import { CatalogService } from './catalog.service';
 import { CatalogController } from './catalog.controller';
 import { SeedService } from './seed.service';
+import { TypeOrmModule } from '@nestjs/typeorm';
 
 @Module({
   imports: [
