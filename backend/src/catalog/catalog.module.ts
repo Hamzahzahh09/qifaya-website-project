@@ -9,11 +9,11 @@ import { CatalogController } from './catalog.controller';
 import { SeedService } from './seed.service';
 
 @Module({
-    imports: [
-        TypeOrmModule.forFeature([Product, Category, ProductVariant, ProductImage]),
-    ],
-    providers: [CatalogService, SeedService],
-    controllers: [CatalogController],
-    exports: [CatalogService],
+  imports: [
+    TypeOrmModule.forFeature([Product, Category, ProductVariant, ProductImage]),
+  ],
+  providers: [CatalogService, SeedService],
+  controllers: [CatalogController],
+  exports: [CatalogService],
 })
-export class CatalogModule { }
+export class CatalogModule {}
