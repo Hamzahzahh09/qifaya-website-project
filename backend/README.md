@@ -70,6 +70,17 @@ $ mau deploy
 
 With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
 
+## Database changes and inactivity policy
+
+The authentication flow now enforces a **30‑day inactivity logout**. Users who haven't logged in for more than 30 days will be automatically marked as unverified and required to re‑verify their email before signing in again. To support this behaviour, the `users` table must include the following additional columns:
+
+```sql
+ALTER TABLE users
+  ADD COLUMN last_login timestamptz;
+```
+
+Every successful login or email verification updates `last_login` to the current timestamp. Expired accounts clear the `refresh_token` and set `is_email_verified` to `false`.
+
 ## Resources
 
 Check out a few resources that may come in handy when working with NestJS:
