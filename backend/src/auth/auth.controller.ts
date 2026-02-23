@@ -5,6 +5,7 @@ import { LoginDto } from './dto/login.dto';
 import { ResendDto } from './dto/resend.dto';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
+import { LoginGoogleDto } from './dto/login-google.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -44,5 +45,10 @@ export class AuthController {
   @Post('reset-password')
   resetPassword(@Body() dto: ResetPasswordDto) {
     return this.authService.resetPassword(dto);
+  }
+
+  @Post('google')
+  loginGoogle(@Body() dto: LoginGoogleDto) {
+    return this.authService.loginGoogle(dto);
   }
 }

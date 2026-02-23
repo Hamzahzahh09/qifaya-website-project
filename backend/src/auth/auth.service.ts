@@ -13,6 +13,7 @@ import { ResendDto } from './dto/resend.dto';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
 import { MailService } from '../mail/mail.service';
 import { ResetPasswordDto } from './dto/reset-password.dto';
+import { LoginGoogleDto } from './dto/login-google.dto';
 
 @Injectable()
 export class AuthService {
@@ -20,7 +21,7 @@ export class AuthService {
     private supabaseService: SupabaseService,
     private jwtService: JwtService,
     private mailService: MailService,
-  ) {}
+  ) { }
 
   generateOtp(): string {
     return Math.floor(100000 + Math.random() * 900000).toString();
@@ -194,7 +195,12 @@ export class AuthService {
         );
     }
 
-    // payload
+    return this.generateTokens(user, isEmailVerified);
+  }
+
+  private async generateTokens(user: any, isEmailVerified: boolean) {
+    const supabase = this.supabaseService.getClient();
+
     const payload = {
       sub: user.id,
       email: user.email,
@@ -388,5 +394,48 @@ export class AuthService {
       .eq('id', user.id);
 
     return { message: 'Password berhasil diubah' };
+  }
+
+  async loginGoogle(dto: LoginGoogleDto) {
+    const supabase = this.supabaseService.getClient();
+    const email = dto.email.toLowerCase().trim();
+
+    // 1. Cari user
+    let { data: user, error: findError } = await supabase
+      .from('users')
+      .select('*')
+      .eq('email', email)
+      .single();
+
+    // 2. Jika tidak ada, buat user baru
+    if (!user) {
+      const { data: newUser, error: createError } = await supabase
+        .from('users')
+        .insert([
+          {
+            name: dto.name,
+            email,
+            avatar: dto.avatar,
+            username: email.split('@')[0] + Math.floor(Math.random() * 1000),
+            role: 'user',
+            is_email_verified: true, // Google email is usually verified
+          },
+        ])
+        .select()
+        .single();
+
+      if (createError) {
+        throw new BadRequestException('Gagal membuat user Google: ' + createError.message);
+      }
+      user = newUser;
+    }
+
+    // 3. Generate tokens (Google login is always verified)
+    const result = await this.generateTokens(user, true);
+
+    return {
+      ...result,
+      message: 'Login Google berhasil',
+    };
   }
 }
